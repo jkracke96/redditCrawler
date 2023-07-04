@@ -13,7 +13,7 @@ def accept_cookies(driver):
 def prepare_driver():
     # Set chromedriver options
     options = webdriver.ChromeOptions()
-    #options.add_argument("headless")
+    options.add_argument("headless")
     options.add_argument("--window-size=2560,1440")
     driver = webdriver.Chrome(options=options)
     driver.maximize_window()
