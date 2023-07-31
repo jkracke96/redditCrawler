@@ -2,7 +2,14 @@ from moviepy.editor import *
 
 
 def get_screenshots(post_folder, comment_folder):
+    """
+    Iterate through posts and find the respective screenshots. The add post and comment pairs to content dict
+    :param post_folder
+    :param comment_folder
+    :return: content dict including all post and comment pairs as values with the respective post as key
+    """
     content = dict()
+    # Iterate through posts and find the respective screenshots. The add post and comment pairs to content dict
     for filename in os.listdir(post_folder):
         current_post = []
         if filename.endswith(".png"):
@@ -29,10 +36,10 @@ def create_video(content, video_output_folder):
 
 
 if __name__ == "__main__":
+    # set params
     post_folder = "screenshots/posts"
     comment_folder = "screenshots/comments"
     video_output_folder = "video"
 
     content = get_screenshots(post_folder, comment_folder)
-
     create_video(content, video_output_folder)
