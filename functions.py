@@ -22,22 +22,27 @@ def prepare_driver():
 
 
 def extract_text(element, content_type, post_counter, comment_counter=None):
+    # define html tag that contains the comment text
     if "post" in content_type:
         elements = element.find_elements(By.TAG_NAME, "h3")
     else:
         elements = element.find_elements(By.TAG_NAME, "p")
+
     for elem in elements:
         text = elem.text
+        # if it is the first post, clear the existing json. Otherwise, load the existing content from json
         if "post" in content_type and post_counter == 0:
             data = dict()
         else:
             with open("screenshots/texts.json", "r") as f:
                 data = json.load(f)
 
+        # write post/comment text to dict
         if "post" in content_type:
             data[f"post_{post_counter}"] = text
         else:
             data[f"post_{post_counter}_comment_{comment_counter}"] = text
+
         with open("screenshots/texts.json", "w") as f:
             json.dump(data, f)
 
