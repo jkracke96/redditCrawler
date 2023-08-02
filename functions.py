@@ -1,6 +1,38 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 import json
+from selenium import webdriver
+from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
+
+
+def screenshot_comments(comment_driver, link, post_counter):
+    comment_driver.get(link)
+    # Get all <div> elements and look for items with data_testid="post-container"
+    comment_elements = comment_driver.find_elements(By.TAG_NAME, "shreddit-comment")
+    comment_counter = 0
+    for comment_element in comment_elements:
+        try:
+            thing_id = comment_element.get_attribute("thingid")
+            parent_id = comment_element.get_attribute("parentid")
+        except StaleElementReferenceException:
+            print("--------- get_attribute() failed")
+        if len(thing_id) == 10 and parent_id is None:
+            try:
+                comment_element.screenshot(f"screenshots/comments/post_{post_counter}_comment{comment_counter}.png", )
+                extract_text(comment_element, "comment", post_counter, comment_counter)
+                comment_counter += 1
+            except WebDriverException:
+                print("------------ This element is not visible")
+        if comment_counter == 5:
+            print(f"{comment_counter} comments were extracted")
+            break
+
+
+def go_to_comments(element):
+    children = element.find_elements(By.TAG_NAME, "a")
+    for child in children:
+        comments_link = child.get_attribute("href")
+        if "comments" in comments_link:
+            return comments_link
 
 
 def accept_cookies(driver):
