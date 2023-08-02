@@ -28,10 +28,11 @@ def get_screenshots(post_folder, comment_folder):
 def create_video(content, video_output_folder):
     for key in content.keys():
         post = content[key]
-        clips = [ImageClip(p).set_duration(2) for p in post]
+        clips = [ImageClip(p).set_duration(5) for p in post]
 
         video_name = key.replace(".png", "")
         concat_clip = concatenate_videoclips(clips, method="compose")
+        concat_clip.set_audio()
         concat_clip.write_videofile(f"{video_output_folder}/{video_name}.mp4", fps=24)
 
 

@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 import json
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
+from gtts import gTTS
 
 
 def screenshot_comments(comment_driver, link, post_counter):
@@ -31,6 +32,8 @@ def go_to_comments(element):
     children = element.find_elements(By.TAG_NAME, "a")
     for child in children:
         comments_link = child.get_attribute("href")
+        if comments_link is None:
+            return None
         if "comments" in comments_link:
             return comments_link
 
@@ -46,11 +49,24 @@ def accept_cookies(driver):
 def prepare_driver():
     # Set chromedriver options
     options = webdriver.ChromeOptions()
-    options.add_argument("headless")   # headless = do not show browser window
+    #options.add_argument("headless")   # headless = do not show browser window
     options.add_argument("--window-size=2560,1440")
     driver = webdriver.Chrome(options=options)
     driver.maximize_window()
     return driver
+
+
+def text_to_speech(text, key):
+    try:
+        # Create a Google text to speech object
+        tts = gTTS(text)
+    except Exception as e:
+        print(e)
+        print(f"Text for {key} could not be converted to audio: {text}")
+        tts = gTTS("haha")
+
+    # Save the generated speech as an audio file
+    tts.save(f"audio/{key}.mp3")
 
 
 def extract_text(element, content_type, post_counter, comment_counter=None):
@@ -62,6 +78,8 @@ def extract_text(element, content_type, post_counter, comment_counter=None):
 
     for elem in elements:
         text = elem.text
+        if text == "":
+            continue
         # if it is the first post, clear the existing json. Otherwise, load the existing content from json
         if "post" in content_type and post_counter == 0:
             data = dict()
@@ -71,9 +89,13 @@ def extract_text(element, content_type, post_counter, comment_counter=None):
 
         # write post/comment text to dict
         if "post" in content_type:
-            data[f"post_{post_counter}"] = text
+            key = f"post_{post_counter}"
+            data[key] = text
         else:
-            data[f"post_{post_counter}_comment_{comment_counter}"] = text
+            key = f"post_{post_counter}_comment_{comment_counter}"
+            data[key] = text
+
+        text_to_speech(text, key)
 
         with open("screenshots/texts.json", "w") as f:
             json.dump(data, f)

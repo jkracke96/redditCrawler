@@ -20,6 +20,9 @@ def run(driver, comments_driver):
                 element.screenshot(f"screenshots/posts/post_{counter}.png")
                 extract_text(element, "post", counter)
                 comments_link = go_to_comments(element)
+                if comments_link is None:
+                    counter += 1
+                    continue
                 comments_driver.switch_to.window(comments_driver.current_window_handle)
                 screenshot_comments(comments_driver, comments_link, counter)
                 driver.switch_to.window(driver.current_window_handle)
@@ -31,6 +34,7 @@ def run(driver, comments_driver):
 if __name__ == "__main__":
     # Delete existing screenshots
     screenshot_path = "screenshots"
+    audio_path = "audio"
     sub_paths = ["posts", "comments"]
     for sub_path in sub_paths:
         dir_path = f"{screenshot_path}/{sub_path}"
@@ -38,6 +42,11 @@ if __name__ == "__main__":
         for file in files:
             if "init" not in file:
                 os.remove(f"{dir_path}/{file}")
+
+    files = os.listdir(audio_path)
+    for file in files:
+        if "init" not in file:
+            os.remove(f"{audio_path}/{file}")
 
     # Set chromedriver options
     driver = prepare_driver()
