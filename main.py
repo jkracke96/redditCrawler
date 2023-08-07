@@ -5,30 +5,46 @@ from functions import accept_cookies, prepare_driver, extract_text, screenshot_c
 
 
 def run(driver, comments_driver):
-    # Get all <div> elements and look for items with data_testid="post-container"
-    elements = driver.find_elements(By.TAG_NAME, "div")
-    counter = 0
-    for element in elements:
-        try:
-            data_testid = element.get_attribute("data-testid")
-        except StaleElementReferenceException:
-            print("--------- get_attribute() failed")
-
-        # find post-container from data-testid's
-        if "post-container" == data_testid:
-            try:
-                element.screenshot(f"screenshots/posts/post_{counter}.png")
-                extract_text(element, "post", counter)
-                comments_link = go_to_comments(element)
-                if comments_link is None:
-                    counter += 1
-                    continue
-                comments_driver.switch_to.window(comments_driver.current_window_handle)
-                screenshot_comments(comments_driver, comments_link, counter)
-                driver.switch_to.window(driver.current_window_handle)
+    if "top" in driver.current_url:
+        elements = driver.find_elements(By.TAG_NAME, "shreddit-post")
+        counter = 0
+        for element in elements:
+            element.screenshot(f"screenshots/posts/post_{counter}.png")
+            extract_text(element, "post_top", counter)
+            comments_link = go_to_comments(element)
+            if comments_link is None:
                 counter += 1
-            except WebDriverException:
-                print("------------ This element is not visible")
+                continue
+            comments_driver.switch_to.window(comments_driver.current_window_handle)
+            screenshot_comments(comments_driver, comments_link, counter)
+            driver.switch_to.window(driver.current_window_handle)
+
+            counter += 1
+    else:
+        # Get all <div> elements and look for items with data_testid="post-container"
+        elements = driver.find_elements(By.TAG_NAME, "div")
+        counter = 0
+        for element in elements:
+            try:
+                data_testid = element.get_attribute("data-testid")
+            except StaleElementReferenceException:
+                print("--------- get_attribute() failed")
+
+            # find post-container from data-testid's
+            if "post-container" == data_testid:
+                try:
+                    element.screenshot(f"screenshots/posts/post_{counter}.png")
+                    extract_text(element, "post", counter)
+                    comments_link = go_to_comments(element)
+                    if comments_link is None:
+                        counter += 1
+                        continue
+                    comments_driver.switch_to.window(comments_driver.current_window_handle)
+                    screenshot_comments(comments_driver, comments_link, counter)
+                    driver.switch_to.window(driver.current_window_handle)
+                    counter += 1
+                except WebDriverException:
+                    print("------------ This element is not visible")
 
 
 if __name__ == "__main__":
@@ -53,7 +69,7 @@ if __name__ == "__main__":
     comments_driver = prepare_driver()
 
     # Point driver to URL
-    driver.get("https://www.reddit.com/r/wallstreetbets/hot/")
+    driver.get("https://www.reddit.com/r/wallstreetbets/top/?t=month")
 
     # Accept cookies
     accept_cookies(driver)

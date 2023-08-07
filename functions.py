@@ -27,7 +27,7 @@ def screenshot_comments(comment_driver, link, post_counter):
                 comment_counter += 1
             except WebDriverException:
                 print("------------ This element is not visible")
-        if comment_counter == 5:
+        if comment_counter == 3:
             print(f"{comment_counter} comments were extracted")
             break
 
@@ -54,7 +54,7 @@ def prepare_driver():
     # Set chromedriver options
     options = webdriver.ChromeOptions()
     options.add_argument("headless")   # headless = do not show browser window
-    options.add_argument("--window-size=2560,1440")
+    options.add_argument("--window-size=1920,1080")
     driver = webdriver.Chrome(options=options)
     driver.maximize_window()
     return driver
@@ -63,7 +63,7 @@ def prepare_driver():
 def text_to_speech(text, key):
     try:
         # Create a Google text to speech object
-        tts = gTTS(text)
+        tts = gTTS(text, lang="en-uk")
     except Exception as e:
         print(e)
         print(f"Text for {key} could not be converted to audio: {text}")
@@ -75,7 +75,13 @@ def text_to_speech(text, key):
 
 def extract_text(element, content_type, post_counter, comment_counter=None):
     # define html tag that contains the comment text
-    if "post" in content_type:
+    if "post_top" in content_type:
+        elements = element.find_elements(By.TAG_NAME, "div")
+        for element in elements:
+            if "post-title" in element.get_attribute("id"):
+                elements = [element]
+                break
+    elif "post" in content_type:
         elements = element.find_elements(By.TAG_NAME, "h3")
     else:
         elements = element.find_elements(By.TAG_NAME, "p")
@@ -103,5 +109,6 @@ def extract_text(element, content_type, post_counter, comment_counter=None):
 
         with open("screenshots/texts.json", "w") as f:
             json.dump(data, f)
+        break
 
 
