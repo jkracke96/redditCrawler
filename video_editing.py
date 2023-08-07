@@ -42,7 +42,7 @@ def determine_audio_clip_lenght(post):
 
 
 def create_video(content, video_output_folder):
-    pause = 2
+    pause = 1
     for key in content.keys():
         post = content[key]
         durations = determine_audio_clip_lenght(post)
