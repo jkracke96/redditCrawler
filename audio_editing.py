@@ -27,14 +27,15 @@ def concatenate_audio(audio_path, audio_files, output_filename, target_duration=
     combined_audio.export(output_filename, format="mp3")
 
 
-# List of audio files to concatenate
-audio_path = "audio"
-audio_files = os.listdir(audio_path)
-audio_files.remove("__init__.py")
-audio_files.sort()
+if __name__ == "__main__":
+    # List of audio files to concatenate
+    audio_path = "audio"
+    audio_files = os.listdir(audio_path)
+    audio_files.remove("__init__.py")
+    audio_files.sort()
 
-# Output filename for the concatenated audio
-output_filename = f"combined_audio.mp3"
+    # Output filename for the concatenated audio
+    output_filename = f"combined_audio.mp3"
 
-# Call the concatenate_audio function
-concatenate_audio(audio_path, audio_files, output_filename)
+    # Call the concatenate_audio function
+    concatenate_audio(audio_path, audio_files, output_filename)
