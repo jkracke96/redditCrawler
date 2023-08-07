@@ -11,31 +11,35 @@ def adjust_audio_speed(audio_segment, target_duration):
     return adjusted_audio
 
 
-def concatenate_audio(audio_path, audio_files, output_filename, target_duration=5):
+def concatenate_audio(audio_path, audio_files, output_filename, pause):
     combined_audio = AudioSegment.silent(duration=0)
 
     for file in audio_files:
         print(f"{audio_path}/{file}")
         audio_segment = AudioSegment.from_file(f"{audio_path}/{file}")
-
-
-        # Adjust the speed to match the target duration
-        adjusted_audio = adjust_audio_speed(audio_segment, target_duration)
-
-        combined_audio += adjusted_audio
+        pause_segment = AudioSegment.silent(duration=pause*1100)    # multiplied by 1000 for ms to s conversion
+        print(len(audio_segment))
+        audio_segment += pause_segment
+        print(len(audio_segment))
+        combined_audio += audio_segment
 
     combined_audio.export(output_filename, format="mp3")
 
 
-if __name__ == "__main__":
+def run_audio_edit(post, output_filename, pause=0):
     # List of audio files to concatenate
     audio_path = "audio"
-    audio_files = os.listdir(audio_path)
-    audio_files.remove("__init__.py")
-    audio_files.sort()
-
-    # Output filename for the concatenated audio
-    output_filename = f"combined_audio.mp3"
+    all_audio_files = os.listdir(audio_path)
+    all_audio_files.remove("__init__.py")
+    all_audio_files.sort()
+    audio_files = []
+    # without 2nd condition, e.g. post10 would also be selected when post "post1"
+    for file in all_audio_files:
+        if post in file:
+            if "comment" not in file and len(post) + 4 == len(file):
+                audio_files.append(file)
+            elif f"{post}_comment" in file:
+                audio_files.append(file)
 
     # Call the concatenate_audio function
-    concatenate_audio(audio_path, audio_files, output_filename)
+    concatenate_audio(audio_path, audio_files, output_filename, pause)

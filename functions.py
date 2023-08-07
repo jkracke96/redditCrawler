@@ -11,6 +11,10 @@ def screenshot_comments(comment_driver, link, post_counter):
     comment_elements = comment_driver.find_elements(By.TAG_NAME, "shreddit-comment")
     comment_counter = 0
     for comment_element in comment_elements:
+        # skip for first comment as it's a user statistic
+        if comment_counter == 0:
+            comment_counter += 1
+            continue
         try:
             thing_id = comment_element.get_attribute("thingid")
             parent_id = comment_element.get_attribute("parentid")
@@ -18,7 +22,7 @@ def screenshot_comments(comment_driver, link, post_counter):
             print("--------- get_attribute() failed")
         if len(thing_id) == 10 and parent_id is None:
             try:
-                comment_element.screenshot(f"screenshots/comments/post_{post_counter}_comment{comment_counter}.png", )
+                comment_element.screenshot(f"screenshots/comments/post_{post_counter}_comment_{comment_counter}.png", )
                 extract_text(comment_element, "comment", post_counter, comment_counter)
                 comment_counter += 1
             except WebDriverException:
