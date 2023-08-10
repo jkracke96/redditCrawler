@@ -61,6 +61,36 @@ def get_post_text(post):
     return texts
 
 
+def define_subtitle_tuples(texts, durations, pause):
+    # iterate through each word for each post text
+    subtitles = []
+    interval_start = 0
+    for text in texts:
+        words = text.split()
+        spaces = text.count(" ")
+        chars_text = len(text)
+        space_length = spaces/chars_text
+
+        # for each word, determine the relative length compared to the whole text and determine the interval for which
+        # the subtitle is supposed to be shown
+
+        # maybe use gtts to determine the exact length of every word?
+        for word in words:
+            chars_word = len(word)
+            duration = durations[texts.index(text)]
+            interval_length = (chars_word/chars_text)*duration
+            if words.index(word) < len(words)-1:
+                interval_end = interval_start + interval_length + space_length
+                subtitles.append(((interval_start, interval_end), word))
+                interval_start = interval_end
+            else:
+                interval_end = interval_start + interval_length + pause
+                subtitles.append(((interval_start, interval_end), word))
+                interval_start = interval_end
+
+    return subtitles
+
+
 def create_video(content, video_output_folder):
     pause = 1
     for key in content.keys():
@@ -75,7 +105,8 @@ def create_video(content, video_output_folder):
         audio_file_clip = AudioFileClip("combined_audio.mp3")
         concat_clip = concat_clip.set_audio(audio_file_clip)
 
-        get_post_text(post)
+        post_texts = get_post_text(post)
+        subtitles = define_subtitle_tuples(post_texts, durations, pause)
 
         concat_clip.write_videofile(
             f"{video_output_folder}/{video_name}.mp4",
