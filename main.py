@@ -69,7 +69,7 @@ if __name__ == "__main__":
     comments_driver = prepare_driver()
 
     # Point driver to URL
-    driver.get("https://www.reddit.com/r/wallstreetbets/top/?t=month")
+    driver.get("https://www.reddit.com/r/wallstreetbets/top/")
 
     # Accept cookies
     accept_cookies(driver)

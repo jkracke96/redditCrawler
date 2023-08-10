@@ -54,7 +54,7 @@ def prepare_driver():
     # Set chromedriver options
     options = webdriver.ChromeOptions()
     options.add_argument("headless")   # headless = do not show browser window
-    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--window-size=3840,2160")
     driver = webdriver.Chrome(options=options)
     driver.maximize_window()
     return driver
