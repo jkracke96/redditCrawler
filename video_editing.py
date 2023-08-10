@@ -1,5 +1,6 @@
 from moviepy.editor import *
 from audio_editing import run_audio_edit
+import json
 
 
 def get_screenshots(post_folder, comment_folder):
@@ -41,6 +42,25 @@ def determine_audio_clip_lenght(post):
     return durations
 
 
+def get_post_text(post):
+    post_keys = []
+    # prepare post and comment keys for json
+    for file in post:
+        audio_text = file.replace("screenshots/posts/", "")
+        audio_text = audio_text.replace("screenshots/comments/", "")
+        audio_text = audio_text.replace(".png", "")
+        post_keys.append(audio_text)
+
+    # get texts for relevant post and comments from json
+    f = open("screenshots/texts.json", "r")
+    json_data = json.load(f)
+    texts = []
+    for post_key in post_keys:
+        texts.append(json_data[post_key])
+
+    return texts
+
+
 def create_video(content, video_output_folder):
     pause = 1
     for key in content.keys():
@@ -54,6 +74,8 @@ def create_video(content, video_output_folder):
         run_audio_edit(video_name, "combined_audio.mp3", pause)
         audio_file_clip = AudioFileClip("combined_audio.mp3")
         concat_clip = concat_clip.set_audio(audio_file_clip)
+
+        get_post_text(post)
 
         concat_clip.write_videofile(
             f"{video_output_folder}/{video_name}.mp4",
