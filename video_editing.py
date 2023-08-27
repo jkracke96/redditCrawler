@@ -63,7 +63,9 @@ def get_post_text(post):
 
 def define_subtitle_tuples(texts, durations, pause):
     # iterate through each word for each post text
-    subtitles = []
+    subtitles_text = []
+    subtitles_start = []
+    subtitles_end = []
     interval_start = 0
     for text in texts:
         words = text.split()
@@ -75,22 +77,52 @@ def define_subtitle_tuples(texts, durations, pause):
         # the subtitle is supposed to be shown
 
         # maybe use gtts to determine the exact length of every word?
+        subtitles_sub_text = []
+        subtitles_sub_start = []
+        subtitles_sub_end = []
         for word in words:
             chars_word = len(word)
             duration = durations[texts.index(text)]
             interval_length = (chars_word/chars_text)*duration
             if words.index(word) < len(words)-1:
                 interval_end = interval_start + interval_length + space_length
-                subtitles.append(((interval_start, interval_end), word))
+                subtitles_sub_text.append(word)
+                subtitles_sub_start.append(interval_start)
+                subtitles_sub_end.append(interval_end)
+                #subtitles.append(((interval_start, interval_end), word))
                 interval_start = interval_end
             else:
-                #interval_end = interval_start + interval_length + pause
-                interval_end = interval_start + interval_length
-                subtitles.append(((interval_start, interval_end), word))
+                interval_end = interval_start + interval_length + pause
+                subtitles_sub_text.append(word)
+                subtitles_sub_start.append(interval_start)
+                subtitles_sub_end.append(interval_end)
                 interval_start = interval_end
-    if interval_end > duration:
-        multiplier = duration * interval_end
-        adj_subtitles = [i * multiplier for i in subtitles]
+
+        # dirty fix: match calculated subtitle intervals to actual length
+        difference = 0
+        interval_duration = subtitles_sub_end[-1] - subtitles_sub_start[0]
+        if interval_duration != duration:
+            difference = (duration - interval_duration)/len(subtitles_sub_start)
+
+        adj_subtitles_start = []
+        for i in subtitles_sub_start:
+            adj_subtitles_start.append(i + difference * subtitles_sub_start.index(i))
+
+        adj_subtitles_end = []
+        for i in subtitles_sub_end:
+            adj_subtitles_end.append(i + difference * (subtitles_sub_end.index(i)+1))
+
+        interval_start = adj_subtitles_end[-1]
+
+        subtitles_text += subtitles_sub_text
+        subtitles_start += adj_subtitles_start
+        subtitles_end += adj_subtitles_end
+
+    # create list with ((start, end), word) tuples
+    subtitles = []
+    for word in subtitles_text:
+        word_index = subtitles_text.index(word)
+        subtitles.append(((subtitles_start[word_index], subtitles_end[word_index]), word))
 
     return subtitles
 
