@@ -104,6 +104,7 @@ def define_subtitle_tuples(texts, durations, pause):
         if interval_duration != duration:
             difference = (duration - interval_duration)/len(subtitles_sub_start)
 
+        # add difference to subtitles start and end lists. 0. element of start = 1. element of end
         adj_subtitles_start = []
         for i in subtitles_sub_start:
             adj_subtitles_start.append(i + difference * subtitles_sub_start.index(i))
