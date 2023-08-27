@@ -84,9 +84,13 @@ def define_subtitle_tuples(texts, durations, pause):
                 subtitles.append(((interval_start, interval_end), word))
                 interval_start = interval_end
             else:
-                interval_end = interval_start + interval_length + pause
+                #interval_end = interval_start + interval_length + pause
+                interval_end = interval_start + interval_length
                 subtitles.append(((interval_start, interval_end), word))
                 interval_start = interval_end
+    if interval_end > duration:
+        multiplier = duration * interval_end
+        adj_subtitles = [i * multiplier for i in subtitles]
 
     return subtitles
 
