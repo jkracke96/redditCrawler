@@ -27,6 +27,8 @@ This is a Python script that utilizes Selenium to crawl through the "hot" page o
 - Accepts cookies on the Reddit website.
 - Takes screenshots of the posts and their corresponding comments.
 - Deletes existing screenshots before each run.
+- Creates audio files from post/comment text
+- Creates videos for each post from screenshots with respective audio
 
 ## Explanation
 
