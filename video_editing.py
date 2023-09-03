@@ -1,4 +1,5 @@
 from moviepy.editor import *
+from moviepy.video.tools.subtitles import SubtitlesClip
 from audio_editing import run_audio_edit
 import json
 
@@ -144,6 +145,9 @@ def create_video(content, video_output_folder):
 
         post_texts = get_post_text(post)
         subtitles = define_subtitle_tuples(post_texts, durations, pause)
+        generator = lambda txt: TextClip(txt, font='Arial', fontsize=24, color='white')
+        subtitles_clip = SubtitlesClip(subtitles)   # requires ImageMagick installation
+        concat_clip = CompositeVideoClip([concat_clip, subtitles_clip.set_position(('center', 'bottom'))])
 
         concat_clip.write_videofile(
             f"{video_output_folder}/{video_name}.mp4",
