@@ -3,6 +3,7 @@ import json
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
 from gtts import gTTS
+import os
 
 
 def screenshot_comments(comment_driver, link, post_counter):
@@ -51,6 +52,11 @@ def accept_cookies(driver):
 
 
 def prepare_driver():
+    # extend PATH environment variable
+    path = os.environ["PATH"]
+    path = "/Users/juliuskracke/PycharmProjects/redditCrawler:" + path
+    os.environ["PATH"] = path
+
     # Set chromedriver options
     options = webdriver.ChromeOptions()
     options.add_argument("headless")   # headless = do not show browser window
